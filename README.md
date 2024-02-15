@@ -13,7 +13,7 @@ The project is focused on exploring signal processing techniques with WaveletCom
 
 ## How to Install WaveletComp package
 ```{r}
-install.packages(WaveletComp)
+install.packages("WaveletComp")
 ```
 
 ## Code
