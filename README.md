@@ -36,16 +36,14 @@ For questions about this repository, please contact me at [contact@danieljpelleg
 
 The project involves the following students: [Nicholas Rossi](https://github.com/NickRossi89)
 
-────────────────────────────────────────────────────────────────────────
 ## Project Description
 This project aims to explore the capabilities of the WaveletComp package in R. The WaveletComp package is a package that provides functions for wavelet-based analysis of univariate time series, including wavelet coherence and cross-wavelet analysis. The project will explore the capabilities of the package and apply it to real-world data. The project will also aim to understand the underlying theory behind wavelet analysis and its applications in signal processing.
 
-────────────────────────────────────────────────────────────────────────
 ## How to Install WaveletComp package
-```{r, echo=FALSE}
+```{r}
 install.packages(WaveletComp)
 ```
-────────────────────────────────────────────────────────────────────────
+
 # Introduction
 WaveletComp is a package in R that provides a suite of functions for wavelet-based analysis of univariate time series. This package is particularly useful for analyzing time series data that is non-stationary, or has a time-varying spectrum. The package provides a variety of functions for wavelet analysis, including time-frequency plots, wavelet coherence, cross-wavelet analysis, and wavelet phase analysis. The package is also capable of conducting wavelet analysis on multiple time series simultaneously, which can be useful for comparing multiple time series and identifying common features. This project aims to explore the capabilities of the WaveletComp package and demonstrate its use in analyzing real-world time series data.
 
