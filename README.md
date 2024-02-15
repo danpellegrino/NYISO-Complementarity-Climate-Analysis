@@ -1,7 +1,6 @@
-────────────────────────────────────────────────────────────────────────
-# Title: Exploring Signal Processing Techniques with WaveletComp in R
-# Author: [Daniel Pellegrino](https://danieljpellegrino.com/)
-────────────────────────────────────────────────────────────────────────
+# Exploring Signal Processing Techniques with WaveletComp in R
+## Author: [Daniel Pellegrino](https://danieljpellegrino.com/)
+
 ## Overview
 This repository contains the code and data for the research project that I am conducting in Spring 2024.
 The project is focused on exploring signal processing techniques with WaveletComp in R. The repository contains the following files:
