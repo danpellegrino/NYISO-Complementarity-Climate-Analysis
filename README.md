@@ -11,6 +11,11 @@ The project is focused on exploring signal processing techniques with WaveletCom
 4. `output/`: A directory that contains the output generated from the R code.
 5. `manuscript/`: A directory that contains the manuscript for the research project.
 
+## How to Install WaveletComp package
+```{r}
+install.packages(WaveletComp)
+```
+
 ## Code
 The `code/` directory contains the R code used in the project. The code is organized into the following files:
 
@@ -35,31 +40,3 @@ The `manuscript/` directory contains the manuscript for the research project. Th
 For questions about this repository, please contact me at [contact@danieljpellegrino.com](contact@danieljpellegrino.com).
 
 The project involves the following students: [Nicholas Rossi](https://github.com/NickRossi89)
-
-## Project Description
-This project aims to explore the capabilities of the WaveletComp package in R. The WaveletComp package is a package that provides functions for wavelet-based analysis of univariate time series, including wavelet coherence and cross-wavelet analysis. The project will explore the capabilities of the package and apply it to real-world data. The project will also aim to understand the underlying theory behind wavelet analysis and its applications in signal processing.
-
-## How to Install WaveletComp package
-```{r}
-install.packages(WaveletComp)
-```
-
-# Introduction
-WaveletComp is a package in R that provides a suite of functions for wavelet-based analysis of univariate time series. This package is particularly useful for analyzing time series data that is non-stationary, or has a time-varying spectrum. The package provides a variety of functions for wavelet analysis, including time-frequency plots, wavelet coherence, cross-wavelet analysis, and wavelet phase analysis. The package is also capable of conducting wavelet analysis on multiple time series simultaneously, which can be useful for comparing multiple time series and identifying common features. This project aims to explore the capabilities of the WaveletComp package and demonstrate its use in analyzing real-world time series data.
-
-# Project Goals
-The primary goal of this project is to explore the capabilities of the WaveletComp package in R and demonstrate its use in analyzing time series data. Specifically, we aim to achieve the following objectives:
-
-
-# Project Plan
-To achieve the project goals, we plan to follow the following steps:
-
-
-
-# Project Deliverables
-The project deliverables will include the following:
-
-
-────────────────────────────────────────────────────────────────────────
-
-Overall, this repository provides a comprehensive overview of the project, including the literature review, the R code, and the results. The project aims to contribute to the understanding of signal processing techniques and their application to real-world datasets. The code and data provided in this repository can be used as a starting point for further research in this area.
