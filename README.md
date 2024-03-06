@@ -19,6 +19,8 @@ To perform this research, follow these steps:
   <img src="NY-Capacity-Zones.png" alt="New York Capcity Zones">
 </p>
 
+## Layout
+
 1. `README.md`: A markdown file that provides a brief overview of the research project.
 2. `code/`: A directory that contains the R code used in the project.
 3. `data/`: A directory that contains the data used in the project.
