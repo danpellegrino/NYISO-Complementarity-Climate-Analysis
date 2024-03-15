@@ -37,10 +37,10 @@ while (!(confirm_all %in% c("Y", "N"))) {
   }
 }
 
-if (confirm_all != "Y") {
-  zones <- c("A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K")
-  components <- c("1", "2", "3", "4")
+zones <- c("A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K")
+components <- c("1", "2", "3", "4")
 
+if (confirm_all != "Y") {
   # Ask the user which first NYISO Zone they want to compare
   nyszone1 <- ""
   nyszone_prompt1 <- paste("Enter the first NYISO Zone for analyzing:",
@@ -211,10 +211,10 @@ if (confirm_all != "Y") {
 } else {
   completed <- c()
   # Compare all the zones for all the components
-  for (i in 1:length(zones)) {
-    for (j in 1:length(components)) {
-      for (k in 1:length(zones)) {
-        for (l in 1:length(components)) {
+  for (i in seq_along(zones)) {
+    for (j in seq_along(components)) {
+      for (k in seq_along(zones)) {
+        for (l in seq_along(components)) {
           if (i != k) {
             if (k %in% completed) {
               next

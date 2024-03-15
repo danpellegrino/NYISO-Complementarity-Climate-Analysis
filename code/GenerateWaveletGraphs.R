@@ -43,10 +43,10 @@ while (!(confirm_all %in% c("Y", "N"))) {
   }
 }
 
-if (confirm_all != "Y") {
-  zones <- c("A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K")
-  components <- c("1", "2", "3", "4")
+zones <- c("A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K")
+components <- c("1", "2", "3", "4")
 
+if (confirm_all != "Y") {
   # Ask the user which first NYISO Zone they want to compare
   nyszone1 <- ""
   nyszone_prompt1 <- paste("Enter the first NYISO Zone for analyzing:",
@@ -163,6 +163,10 @@ if (confirm_all != "Y") {
 
   cat("\n")
 
+  ####################
+  # THE IMPORTANT PART
+  ####################
+
   # Load the data
   file1 <- paste(directory, component_variable1, "/",
                  "_zone_", nyszone1, ".csv", sep = "")
@@ -179,21 +183,22 @@ if (confirm_all != "Y") {
 
   my_wc <- analyze.coherency(my_data)
 
+  title <- paste("Wavelet Coherence between",
+                 nyszone1, component_name1,
+                 "and", nyszone2, component_name2)
   wc.image(my_wc,
-           legend.params = list(lab = paste("Wavelet Coherence between",
-                                            nyszone1, component_name1,
-                                            "and", nyszone2, component_name2)),
+           legend.params = list(lab = title),
            timelab = "",
            periodlab = "period (days)")
 
-  dev.off()
+  ####################
 } else {
   completed <- c()
   # Compare all the zones for all the components
-  for (i in 1:length(zones)) {
-    for (j in 1:length(components)) {
-      for (k in 1:length(zones)) {
-        for (l in 1:length(components)) {
+  for (i in seq_along(zones)) {
+    for (j in seq_along(components)) {
+      for (k in seq_along(zones)) {
+        for (l in seq_along(components)) {
           if (i != k) {
             if (k %in% completed) {
               next
@@ -227,6 +232,11 @@ if (confirm_all != "Y") {
             }
             print(paste("Comparing Zone", zones[i], component_name1,
                         "against Zone", zones[k], component_name2))
+
+            ####################
+            # THE IMPORTANT PART
+            ####################
+
             # Load the data
             file1 <- paste(directory, component_variable1, "/",
                            "_zone_", zones[i], ".csv", sep = "")
@@ -243,17 +253,21 @@ if (confirm_all != "Y") {
 
             my_wc <- analyze.coherency(my_data)
 
+            title <- paste("Wavelet Coherence between",
+                           zones[i], component_name1,
+                           "and", zones[k], component_name2)
             wc.image(my_wc,
-                     legend.params = list(lab = paste("Wavelet Coherence between",
-                                                      zones[i], component_name1,
-                                                      "and", zones[k], component_name2)),
+                     legend.params = list(lab = title),
                      timelab = "",
                      periodlab = "period (days)")
+
+            ####################
           }
         }
       }
     }
-    finished <- paste("Finished comparing Zone", zones[i], "against all other zones.")
+    finished <- paste("Finished comparing Zone",
+                      zones[i], "against all other zones.")
     completed <- c(completed, i)
     print(finished)
   }
