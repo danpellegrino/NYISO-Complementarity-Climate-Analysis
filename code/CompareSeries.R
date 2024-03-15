@@ -1,15 +1,9 @@
-library("WaveletComp")
 library("reticulate")
-citation("WaveletComp")
 
 # Check if the user needs to install the required packages
 if (!require("reticulate")) {
   install.packages("reticulate")
   library("reticulate")
-}
-if (!require("WaveletComp")) {
-  install.packages("WaveletComp")
-  library("WaveletComp")
 }
 
 directory <- "data/MRI-AGCM3.2/"
@@ -172,19 +166,46 @@ if (confirm_all != "Y") {
   data1 <- read.csv(file1)
   data2 <- read.csv(file2)
 
-  data1[, 1] <- as.Date(data1[, 1], format = "%Y-%m-%d")
-  data2[, 1] <- as.Date(data2[, 1], format = "%Y-%m-%d")
+  # grab the day and month from the data (it's formatted as YYYY-MM-DD)
+  data1$day <- as.numeric(format(as.Date(data1[, 1]), "%d"))
+  data1$month <- as.numeric(format(as.Date(data1[, 1]), "%m"))
+  data2$day <- as.numeric(format(as.Date(data2[, 1]), "%d"))
+  data2$month <- as.numeric(format(as.Date(data2[, 1]), "%m"))
 
-  my_data <- data.frame(x = data1[, 2], y = data2[, 2])
+  data1 <- aggregate(data1[, 2:ncol(data1)],
+                     by = list(data1$day, data1$month), FUN = mean)
+  data2 <- aggregate(data2[, 2:ncol(data2)],
+                     by = list(data2$day, data2$month), FUN = mean)
 
-  my_wc <- analyze.coherency(my_data)
+  # remove the day and month columns
+  data1 <- data1[, -c(1, 2)]
+  data2 <- data2[, -c(1, 2)]
 
-  wc.image(my_wc,
-           legend.params = list(lab = paste("Wavelet Coherence between",
-                                            nyszone1, component_name1,
-                                            "and", nyszone2, component_name2)),
-           timelab = "",
-           periodlab = "period (days)")
+  # Normalize the data
+  data1[, 1] <- (data1[, 1] - mean(data1[, 1])) / sd(data1[, 1])
+  data2[, 1] <- (data2[, 1] - mean(data2[, 1])) / sd(data2[, 1])
+
+  # Smooth the data
+  data1[, 1] <- smooth.spline(data1[, 1])$y
+  data2[, 1] <- smooth.spline(data2[, 1])$y
+
+  png(paste("output/",
+            nyszone1, "_", component_variable1, "_vs_",
+            nyszone2, "_", component_variable2, ".png", sep = ""),
+      width = 800, height = 600)
+
+  # Plot the two graphs together
+  plot(data1[, 1], type = "l", col = "blue",
+       xlab = "Day of the Year", ylab = "Normalized Value",
+       ylim = c(min(data1[, 1], data2[, 1]), max(data1[, 1], data2[, 1])),
+       main = paste("Zone", nyszone1, component_name1,
+                    "against Zone", nyszone2, component_name2))
+
+  lines(data2[, 1], col = "red")
+
+  legend("topleft",
+         legend = c(component_name1, component_name2),
+         col = c("blue", "red"), lty = 1)
 
   dev.off()
 } else {
@@ -236,24 +257,54 @@ if (confirm_all != "Y") {
             data1 <- read.csv(file1)
             data2 <- read.csv(file2)
 
-            data1[, 1] <- as.Date(data1[, 1], format = "%Y-%m-%d")
-            data2[, 1] <- as.Date(data2[, 1], format = "%Y-%m-%d")
+            data1$day <- as.numeric(format(as.Date(data1[, 1]), "%d"))
+            data1$month <- as.numeric(format(as.Date(data1[, 1]), "%m"))
+            data2$day <- as.numeric(format(as.Date(data2[, 1]), "%d"))
+            data2$month <- as.numeric(format(as.Date(data2[, 1]), "%m"))
 
-            my_data <- data.frame(x = data1[, 2], y = data2[, 2])
+            data1 <- aggregate(data1[, 2:ncol(data1)],
+                               by = list(data1$day, data1$month), FUN = mean)
+            data2 <- aggregate(data2[, 2:ncol(data2)],
+                               by = list(data2$day, data2$month), FUN = mean)
 
-            my_wc <- analyze.coherency(my_data)
+            # remove the day and month columns
+            data1 <- data1[, -c(1, 2)]
+            data2 <- data2[, -c(1, 2)]
 
-            wc.image(my_wc,
-                     legend.params = list(lab = paste("Wavelet Coherence between",
-                                                      zones[i], component_name1,
-                                                      "and", zones[k], component_name2)),
-                     timelab = "",
-                     periodlab = "period (days)")
+            # Normalize the data
+            data1[, 1] <- (data1[, 1] - mean(data1[, 1])) / sd(data1[, 1])
+            data2[, 1] <- (data2[, 1] - mean(data2[, 1])) / sd(data2[, 1])
+
+            # Smooth the data
+            data1[, 1] <- smooth.spline(data1[, 1])$y
+            data2[, 1] <- smooth.spline(data2[, 1])$y
+
+            png(paste("output/",
+                      zones[i], "_", component_variable1, "_vs_",
+                      zones[k], "_", component_variable2, ".png", sep = ""),
+                width = 800, height = 600)
+
+            # Plot the two graphs together
+            plot(data1[, 1], type = "l", col = "blue",
+                 xlab = "Day of the Year", ylab = "Normalized Value",
+                 ylim = c(min(data1[, 1], data2[, 1]),
+                          max(data1[, 1], data2[, 1])),
+                 main = paste("Zone", zones[i], component_name1,
+                              "against Zone", zones[k], component_name2))
+
+            lines(data2[, 1], col = "red")
+
+            legend("topleft",
+                   legend = c(component_name1, component_name2),
+                   col = c("blue", "red"), lty = 1)
+
+            dev.off()
           }
         }
       }
     }
-    finished <- paste("Finished comparing Zone", zones[i], "against all other zones.")
+    finished <- paste("Finished comparing Zone",
+                      zones[i], "against all other zones.")
     completed <- c(completed, i)
     print(finished)
   }
