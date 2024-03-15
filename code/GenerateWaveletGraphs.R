@@ -116,7 +116,7 @@ while (!(nyszone2 %in% c(zones))) {
     cat("\n", nyszone2, "is not a valid NYISO Zone.\n\n")
   }
 }
-# Ask the component they want to analyze for the first NYISO Zone
+# Ask the component they want to analyze for the second NYISO Zone
 cat("\n")
 
 component2 <- ""
@@ -174,7 +174,7 @@ component_ts2 <- (component_ts2 - mean(component_ts2)) / sd(component_ts2)
 png(paste("output/",
           nyszone1, "_", component_variable1, "_vs_",
           nyszone2, "_", component_variable2, ".png", sep = ""),
-    width = 6000, height = 600)
+    width = 800, height = 600)
 
 # Plot the two graphs together
 plot(component_ts1, type = "l", col = "blue", xlab = "Date")
