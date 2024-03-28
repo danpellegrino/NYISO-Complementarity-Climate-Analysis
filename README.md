@@ -11,10 +11,11 @@ The project is focused on exploring signal processing techniques with WaveletCom
 
 To perform this research, follow these steps:
 
-1. Install the WaveletComp package by running the following code in R:
+1. Install the WaveletComp and reticulate package by running the following code in R:
 
 ```{r}
 install.packages("WaveletComp")
+install.packages("reticulate")
 # Then select a CRAN mirror.
 ```
 
