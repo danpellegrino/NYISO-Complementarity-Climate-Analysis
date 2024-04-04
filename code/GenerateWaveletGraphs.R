@@ -179,17 +179,28 @@ if (confirm_all != "Y") {
   data1[, 1] <- as.Date(data1[, 1], format = "%Y-%m-%d")
   data2[, 1] <- as.Date(data2[, 1], format = "%Y-%m-%d")
 
+  # Convert the data to monthly averages
+  data1 <- aggregate(data1[, 2], by = list(format(data1[, 1], "%Y-%m")), mean)
+  data2 <- aggregate(data2[, 2], by = list(format(data2[, 1], "%Y-%m")), mean)
+
+  # Merge the data
   my_data <- data.frame(x = data1[, 2], y = data2[, 2])
 
   my_wc <- analyze.coherency(my_data)
+
+  png(paste("output/WaveletCoherence_", nyszone1, "_", component_variable1,
+            "_vs_", nyszone2, "_", component_variable2, ".png", sep = ""),
+      width = 800, height = 800, units = "px")
 
   title <- paste("Wavelet Coherence between",
                  nyszone1, component_name1,
                  "and", nyszone2, component_name2)
   wc.image(my_wc,
            legend.params = list(lab = title),
-           timelab = "",
-           periodlab = "period (days)")
+           timelab = "time (months)",
+            periodlab = "period (months)")
+
+  dev.off()
 
   ####################
 } else {
@@ -249,17 +260,27 @@ if (confirm_all != "Y") {
             data1[, 1] <- as.Date(data1[, 1], format = "%Y-%m-%d")
             data2[, 1] <- as.Date(data2[, 1], format = "%Y-%m-%d")
 
+            # Convert the data to monthly averages
+            data1 <- aggregate(data1[, 2], by = list(format(data1[, 1], "%Y-%m")), mean)
+            data2 <- aggregate(data2[, 2], by = list(format(data2[, 1], "%Y-%m")), mean)
+
             my_data <- data.frame(x = data1[, 2], y = data2[, 2])
 
             my_wc <- analyze.coherency(my_data)
+
+            png(paste("output/WaveletCoherence_", zones[i], "_", component_variable1,
+                      "_vs_", zones[k], "_", component_variable2, ".png", sep = ""),
+                width = 800, height = 800, units = "px")
 
             title <- paste("Wavelet Coherence between",
                            zones[i], component_name1,
                            "and", zones[k], component_name2)
             wc.image(my_wc,
                      legend.params = list(lab = title),
-                     timelab = "",
-                     periodlab = "period (days)")
+                     timelab = "time (months)",
+                     periodlab = "period (months)")
+
+            dev.off()
 
             ####################
           }
