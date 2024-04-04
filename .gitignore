@@ -1,3 +1,5 @@
 *.zip
 *.nc
 *.status
+*.csv
+*.png

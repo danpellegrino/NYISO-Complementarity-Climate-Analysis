@@ -5,7 +5,7 @@
 ## Overview
 
 This repository contains the code and data for the research project that I am conducting in Spring 2024.
-The project is focused on exploring signal processing techniques with WaveletComp in R. The repository contains the following files:
+This specific branch focuses on creating example images for non-complimentarity, complimentarity, and partial complimentarity.
 
 ## Research Methodology
 
@@ -88,12 +88,6 @@ The `code/` directory contains the R code used in the project. The code is organ
 
 1. `waveletcomp_analysis.R`: An R script that contains the code for the signal processing analysis using the WaveletComp package.
 2. `plotting.R`: An R script that contains the code for generating plots from the analysis.
-
-## Data
-
-The `data/` directory contains the data used in the project. The data is organized into the following files:
-
-1. `signal_data.csv`: A CSV file containing the raw signal data used in the analysis.
 
 ## Output
 
