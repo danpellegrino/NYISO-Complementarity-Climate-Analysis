@@ -33,9 +33,10 @@ install.packages("reticulate")
 
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;_Currently we're focusing on:_
 
-- **A**
-- **C**
-- **F**
+- **A** _West_
+- **C** _Central_
+- **E** _Mohawk Valley_
+- **K** _Long Island_
 
 3. Zoom in on each specific sector from the following sources:
 
