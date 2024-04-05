@@ -12,8 +12,8 @@ directory <- "data/"
 py_run_file("code/CreateExampleCSV.py")
 
 # Load the data
-file1 <- paste(directory, "file1.csv", sep = "")
-file2 <- paste(directory, "file2.csv", sep = "")
+file1 <- paste(directory, "data_example1.csv", sep = "")
+file2 <- paste(directory, "data_example1.csv", sep = "")
 
 data1 <- read.csv(file1)
 data2 <- read.csv(file2)
