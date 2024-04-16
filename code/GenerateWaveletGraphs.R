@@ -227,7 +227,7 @@ if (confirm_all != "Y") {
 
   png(paste("output/WaveletCoherence_", nyszone1, "_", component_variable1,
             "_vs_", nyszone2, "_", component_variable2, ".png", sep = ""),
-      width = 800, height = 800, units = "px")
+      width = 1920, height = 1080, pointsize=25, units = "px")
 
   title <- paste("Wavelet Coherence between",
                  nyszone1, component_name1,
@@ -350,7 +350,7 @@ if (confirm_all != "Y") {
 
             png(paste("output/WaveletCoherence_", zones[i], "_", component_variable1,
                       "_vs_", zones[k], "_", component_variable2, ".png", sep = ""),
-                width = 800, height = 800, units = "px")
+                width = 1920, height = 1080, pointsize=25, units = "px")
 
             title <- paste("Wavelet Coherence between",
                            zones[i], component_name1,
