@@ -205,12 +205,18 @@ if (confirm_all != "Y") {
   # Combine the mean and standard deviation into a single data frame
   monthly_stats2 <- data.frame(month = monthly_mean2[, 1], mean = monthly_mean2[, 2], sd = monthly_sd2[, 2])
 
-  # Normalize the data
-  data1[, 2] <- (data1[, 2] - monthly_stats1[match(format(data1[, 1], "%m"), monthly_stats1[, 1]), 2]) /
-    monthly_stats1[match(format(data1[, 1], "%m"), monthly_stats1[, 1]), 3]
+  print(monthly_stats2)
 
-  data2[, 2] <- (data2[, 2] - monthly_stats2[match(format(data2[, 1], "%m"), monthly_stats2[, 1]), 2]) /
-    monthly_stats2[match(format(data2[, 1], "%m"), monthly_stats2[, 1]), 3]
+  # Normalize the data
+  data1[, 2] <- ifelse(monthly_stats1[match(format(data1[, 1], "%m"), monthly_stats1[, 1]), 3] == 0,
+                       0,
+                       (data1[, 2] - monthly_stats1[match(format(data1[, 1], "%m"), monthly_stats1[, 1]), 2]) /
+                         monthly_stats1[match(format(data1[, 1], "%m"), monthly_stats1[, 1]), 3])
+
+  data2[, 2] <- ifelse(monthly_stats2[match(format(data2[, 1], "%m"), monthly_stats2[, 1]), 3] == 0,
+                       0,
+                       (data2[, 2] - monthly_stats2[match(format(data2[, 1], "%m"), monthly_stats2[, 1]), 2]) /
+                         monthly_stats2[match(format(data2[, 1], "%m"), monthly_stats2[, 1]), 3])
 
   ####################
 
