@@ -183,6 +183,37 @@ if (confirm_all != "Y") {
   data1 <- aggregate(data1[, 2], by = list(format(data1[, 1], "%Y-%m")), mean)
   data2 <- aggregate(data2[, 2], by = list(format(data2[, 1], "%Y-%m")), mean)
 
+  # Fix the date column (it needs a day to be a valid date)
+  data1[, 1] <- as.Date(paste(data1[, 1], "-01", sep = ""), format = "%Y-%m-%d")
+  data2[, 1] <- as.Date(paste(data2[, 1], "-01", sep = ""), format = "%Y-%m-%d")
+
+  ####################
+
+  # (data - median)/(standard deviation) - this is the z-score
+  # take all the januarys, feburarys, etc.. and calculate the mean and standard deviation
+  # Calculate the mean and standard deviation for each month
+  monthly_mean1 <- aggregate(data1[, 2], by = list(format(data1[, 1], "%m")), mean)
+  monthly_sd1 <- aggregate(data1[, 2], by = list(format(data1[, 1], "%m")), sd)
+
+  # Combine the mean and standard deviation into a single data frame
+  monthly_stats1 <- data.frame(month = monthly_mean1[, 1], mean = monthly_mean1[, 2], sd = monthly_sd1[, 2])
+
+  # Calculate the mean and standard deviation for each month
+  monthly_mean2 <- aggregate(data2[, 2], by = list(format(data2[, 1], "%m")), mean)
+  monthly_sd2 <- aggregate(data2[, 2], by = list(format(data2[, 1], "%m")), sd)
+
+  # Combine the mean and standard deviation into a single data frame
+  monthly_stats2 <- data.frame(month = monthly_mean2[, 1], mean = monthly_mean2[, 2], sd = monthly_sd2[, 2])
+
+  # Normalize the data
+  data1[, 2] <- (data1[, 2] - monthly_stats1[match(format(data1[, 1], "%m"), monthly_stats1[, 1]), 2]) /
+    monthly_stats1[match(format(data1[, 1], "%m"), monthly_stats1[, 1]), 3]
+
+  data2[, 2] <- (data2[, 2] - monthly_stats2[match(format(data2[, 1], "%m"), monthly_stats2[, 1]), 2]) /
+    monthly_stats2[match(format(data2[, 1], "%m"), monthly_stats2[, 1]), 3]
+
+  ####################
+
   # Merge the data
   my_data <- data.frame(x = data1[, 2], y = data2[, 2])
 
@@ -195,10 +226,17 @@ if (confirm_all != "Y") {
   title <- paste("Wavelet Coherence between",
                  nyszone1, component_name1,
                  "and", nyszone2, component_name2)
+
+  # set up the time axis and the period axis
+  index.ticks <- seq(12*11, nrow(my_data), by = 12*65)
+  index.labels <- format(data1[, 1], "%Y")[index.ticks]
+  
   wc.image(my_wc,
-           legend.params = list(lab = title),
-           timelab = "time (months)",
-            periodlab = "period (months)")
+           main = title,
+           plot.legend = FALSE,
+           timelab = "Date (year)",
+           periodlab = "Period (months)",
+           spec.time.axis = list(at = index.ticks, labels = index.labels))
 
   dev.off()
 
@@ -259,10 +297,41 @@ if (confirm_all != "Y") {
 
             data1[, 1] <- as.Date(data1[, 1], format = "%Y-%m-%d")
             data2[, 1] <- as.Date(data2[, 1], format = "%Y-%m-%d")
-
+            
             # Convert the data to monthly averages
             data1 <- aggregate(data1[, 2], by = list(format(data1[, 1], "%Y-%m")), mean)
             data2 <- aggregate(data2[, 2], by = list(format(data2[, 1], "%Y-%m")), mean)
+
+            # Fix the date column (it needs a day to be a valid date)
+            data1[, 1] <- as.Date(paste(data1[, 1], "-01", sep = ""), format = "%Y-%m-%d")
+            data2[, 1] <- as.Date(paste(data2[, 1], "-01", sep = ""), format = "%Y-%m-%d")
+
+            ####################
+
+            # (data - median)/(standard deviation) - this is the z-score
+            # take all the januarys, feburarys, etc.. and calculate the mean and standard deviation
+            # Calculate the mean and standard deviation for each month
+            monthly_mean1 <- aggregate(data1[, 2], by = list(format(data1[, 1], "%m")), mean)
+            monthly_sd1 <- aggregate(data1[, 2], by = list(format(data1[, 1], "%m")), sd)
+
+            # Combine the mean and standard deviation into a single data frame
+            monthly_stats1 <- data.frame(month = monthly_mean1[, 1], mean = monthly_mean1[, 2], sd = monthly_sd1[, 2])
+
+            # Calculate the mean and standard deviation for each month
+            monthly_mean2 <- aggregate(data2[, 2], by = list(format(data2[, 1], "%m")), mean)
+            monthly_sd2 <- aggregate(data2[, 2], by = list(format(data2[, 1], "%m")), sd)
+
+            # Combine the mean and standard deviation into a single data frame
+            monthly_stats2 <- data.frame(month = monthly_mean2[, 1], mean = monthly_mean2[, 2], sd = monthly_sd2[, 2])
+
+            # Normalize the data
+            data1[, 2] <- (data1[, 2] - monthly_stats1[match(format(data1[, 1], "%m"), monthly_stats1[, 1]), 2]) /
+              monthly_stats1[match(format(data1[, 1], "%m"), monthly_stats1[, 1]), 3]
+
+            data2[, 2] <- (data2[, 2] - monthly_stats2[match(format(data2[, 1], "%m"), monthly_stats2[, 1]), 2]) /
+              monthly_stats2[match(format(data2[, 1], "%m"), monthly_stats2[, 1]), 3]
+
+            ####################
 
             my_data <- data.frame(x = data1[, 2], y = data2[, 2])
 
@@ -275,10 +344,17 @@ if (confirm_all != "Y") {
             title <- paste("Wavelet Coherence between",
                            zones[i], component_name1,
                            "and", zones[k], component_name2)
+
+            # set up the time axis and the period axis
+            index.ticks <- seq(12*11, nrow(my_data), by = 12*65)
+            index.labels <- format(data1[, 1], "%Y")[index.ticks]
+
             wc.image(my_wc,
-                     legend.params = list(lab = title),
-                     timelab = "time (months)",
-                     periodlab = "period (months)")
+                     main = title,
+                     plot.legend = FALSE,
+                     timelab = "Date (year)",
+                     periodlab = "Period (months)",
+                     spec.time.axis = list(at = index.ticks, labels = index.labels))
 
             dev.off()
 
