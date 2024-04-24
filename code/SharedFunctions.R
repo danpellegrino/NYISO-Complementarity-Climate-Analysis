@@ -4,7 +4,7 @@ library("WaveletComp")
 # Set the data directory
 directory <- "data/MRI-AGCM3.2/"
 # Using the following NYISO Zones, goes from A to K
-zones <- c("A", "C", "D", "E", "K")
+zones <- c("A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K")
 # Using the following components, goes from 1 to 4
 components <- c("1", "2", "3", "4")
 
