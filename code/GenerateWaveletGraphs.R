@@ -130,9 +130,9 @@ wavelet_analysis <- function(nys1, nys2) {
                   "_vs_", nys2$zone, "_", nys2$component$variable, ".png", sep = "")
   }
 
-  title <- paste("Wavelet Coherence between",
+  title <- paste("Wavelet Analysis of Zone",
                  nys1$zone, nys1$component$name,
-                 "and", nys2$zone, nys2$component$name)
+                 "and Zone", nys2$zone, nys2$component$name)
 
   # Perform the wavelet analysis
   my_wc <- analyze_coherency(nys1_data, "variable", nys2_data, "variable", monthly)
