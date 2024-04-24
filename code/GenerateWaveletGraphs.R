@@ -137,7 +137,7 @@ wavelet_analysis <- function(nys1, nys2) {
   # Perform the wavelet analysis
   my_wc <- analyze_coherency(nys1_data, "variable", nys2_data, "variable", monthly)
   
-  png(file, width = 1920, height = 1080, pointsize=25, units = "px")
+  png(file, width = 3.47, height = 1.84, units = "in", res = 1000, pointsize = 3)
 
   # Produce the plot
   plot_wave(my_wc, title, index.ticks, index.labels, monthly)
