@@ -83,7 +83,7 @@ if (confirm_all == "N") {
 } else {
     for (zone in zones) {
         for (component in components) {
-            nysiso <- list(zone = zone, component = component)
+            nysiso <- list(zone = zone, component = detect_component(component))
             average_power(nysiso)
         }
     }
