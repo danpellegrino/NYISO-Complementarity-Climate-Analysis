@@ -62,10 +62,10 @@ compare_series <- function(nys1, nys2) {
   nys2_data$variable <- smooth_data(nys2_data$variable)
   combined_data$variable <- smooth_data(combined_data$variable)
 
-  png(paste("output/",
+  svg(paste("output/TimeSeries_",
             nys1$zone, "_", nys1$component$variable, "_vs_",
-            nys2$zone, "_", nys2$component$variable, ".png", sep = ""),
-      width = 3.47, height = 1.84, units = "in", res = 1000, pointsize = 3)
+            nys2$zone, "_", nys2$component$variable, ".svg", sep = ""),
+      width = 8, height = 4.4, pointsize = 6)
 
   # Plot the two graphs together
   plot(nys1_data$variable, type = "l", col = "blue",

@@ -117,7 +117,7 @@ wavelet_analysis <- function(nys1, nys2) {
     index.labels <- format(nys1_data$date, "%Y")[index.ticks]
 
     file <- paste("output/WaveletCoherence_", nys1$zone, "_", nys1$component$variable,
-                  "_vs_", nys2$zone, "_", nys2$component$variable, "_monthly.png", sep = "")
+                  "_vs_", nys2$zone, "_", nys2$component$variable, "_monthly.svg", sep = "")
   } else {
     # standard deviation
     #nys1_data <- daily_stdev(nys1_data, "date", "variable")
@@ -127,7 +127,7 @@ wavelet_analysis <- function(nys1, nys2) {
     index.labels <- format(nys1_data$date, "%Y")[index.ticks]
 
     file <- paste("output/WaveletCoherence_", nys1$zone, "_", nys1$component$variable,
-                  "_vs_", nys2$zone, "_", nys2$component$variable, ".png", sep = "")
+                  "_vs_", nys2$zone, "_", nys2$component$variable, ".svg", sep = "")
   }
 
   title <- paste("Wavelet Analysis of Zone",
@@ -137,7 +137,7 @@ wavelet_analysis <- function(nys1, nys2) {
   # Perform the wavelet analysis
   my_wc <- analyze_coherency(nys1_data, "variable", nys2_data, "variable", monthly)
   
-  png(file, width = 3.47, height = 1.84, units = "in", res = 1000, pointsize = 3)
+  svg(file, width = 8, height = 4.4, pointsize = 6)
 
   # Produce the plot
   plot_wave(my_wc, title, index.ticks, index.labels, monthly)
