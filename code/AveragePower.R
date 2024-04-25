@@ -51,7 +51,6 @@ average_power <- function(nysiso) {
 
   nysiso_data <- create_data_frame(nysiso)
   ##############################
-  print(nysiso)
 
   if (monthly == "Y") {
     # Convert the data to monthly
