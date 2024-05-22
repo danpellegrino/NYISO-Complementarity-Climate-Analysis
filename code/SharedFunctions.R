@@ -158,6 +158,11 @@ create_data_frame <- function(place) {
 
 standardize_data <- function(data) {
   data <- scale(data, scale = TRUE)
+
+  # Incase the data is all NA
+  if (is.na(data[1])) {
+    data <- rep(0, length(data))
+  }
   
   return(data)
 }
