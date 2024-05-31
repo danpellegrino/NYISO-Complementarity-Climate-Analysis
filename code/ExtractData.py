@@ -137,6 +137,7 @@ for choice in user_choice:
             lon_zone = -74.86723
         elif zone == 'E':
             # Zone E - Mohawk Valley
+            # CHANGE THIS TO THE CORRECT LATITUDE AND LONGITUDE
             lat_zone = 42.375
             lon_zone = -75.42943
         elif zone == 'F':
