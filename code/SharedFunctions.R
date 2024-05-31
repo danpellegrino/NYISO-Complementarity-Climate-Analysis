@@ -14,6 +14,22 @@ detect_uninstalled_packages <- function() {
     install.packages("reticulate")
     library("reticulate")
   }
+  if (!require("WaveletComp")) {
+    install.packages("WaveletComp")
+    library("WaveletComp")
+  }
+  if (!require("nasapower")) {
+    install.packages("nasapower")
+    library("nasapower")
+  }
+  if(!require("ggplot2")) {
+    install.packages("ggplot2")
+    library("ggplot2")
+  }
+  if(!require("cowplot")) {
+    install.packages("cowplot")
+    library("cowplot")
+  }
 }
 
 netcdf_convert_prompt <- function() {
