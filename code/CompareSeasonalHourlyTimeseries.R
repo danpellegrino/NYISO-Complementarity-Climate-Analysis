@@ -6,7 +6,6 @@ detect_uninstalled_packages()
 # https://github.com/ropensci/nasapower
 library("nasapower")
 library("ggplot2")
-library("reticulate")
 library("cowplot")
 
 seasons <- c("winter", "spring", "summer", "fall")
