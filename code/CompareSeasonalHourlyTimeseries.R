@@ -1,16 +1,18 @@
+source("code/SharedFunctions.R")
+
+# Check if the user needs to install the required packages
+detect_uninstalled_packages()
+
 # https://github.com/ropensci/nasapower
 library("nasapower")
 library("ggplot2")
 library("reticulate")
 library("cowplot")
 
-source("code/SharedFunctions.R")
-
 seasons <- c("winter", "spring", "summer", "fall")
 parameters <- c("WS2M", "PRECTOTCORR", "PRECSNOLAND", "ALLSKY_SFC_SW_DWN")
 
-# Check if the user needs to install the required packages
-detect_uninstalled_packages()
+
 
 # Do you want to compare all the zones for all the components?
 confirm_all <- all_zones_prompt()

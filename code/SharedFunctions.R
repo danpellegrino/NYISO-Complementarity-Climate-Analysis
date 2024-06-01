@@ -1,6 +1,3 @@
-library("reticulate")
-library("WaveletComp")
-
 # Set the data directory
 directory <- "data/MRI-AGCM3.2/"
 # Using the following NYISO Zones, goes from A to K
