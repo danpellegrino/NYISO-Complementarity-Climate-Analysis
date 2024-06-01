@@ -6,13 +6,23 @@ detect_uninstalled_packages()
 # https://github.com/ropensci/nasapower
 library("nasapower")
 library("ggplot2")
-library("reticulate")
-library("cowplot")
+library("ggcorrplot")
 
 seasons <- c("winter", "spring", "summer", "fall")
 parameters <- c("WS2M", "PRECTOTCORR", "PRECSNOLAND", "ALLSKY_SFC_SW_DWN")
 
-
+detect_component_variable <- function(component) {
+  if (component == 1)
+    component_variable <- "WS2M"
+  else if (component == 2)
+    component_variable <- "PRECTOTCORR"
+  else if (component == 3)
+    component_variable <- "PRECSNOLAND"
+  else if (component == 4)
+    component_variable <- "ALLSKY_SFC_SW_DWN"
+  
+  return(component_variable)
+}
 
 # Do you want to compare all the zones for all the components?
 confirm_all <- all_zones_prompt()
@@ -61,110 +71,115 @@ detect_parameter_name <- function(parameter) {
   return(parameter_name)
 }
 
-get_seasonal_hourly_avg <- function(data, parameter, season) {
-    # Convert the season to uppercase
-    season <- toupper(season)
+download_zone_data <- function(zone) {
+  data <- data.frame(get_power(
+      # The community code for the region of interest
+      # ag - Agroclimatology Archive
+      # sb - Sustainable Buildings Archive
+      # re - Renewable Energy Archive
 
-    # Set the season
-    if (season == "WINTER") {
-        season <- c(12, 1, 2)
-    } else if (season == "SPRING") {
-        season <- c(3, 4, 5)
-    } else if (season == "SUMMER") {
-        season <- c(6, 7, 8)
-    } else if (season == "FALL") {
-        season <- c(9, 10, 11)
-    }
+      # Parameters:
+      # WS2M                  MERRA-2 Wind Speed at 2 Meters (m/s) ;
+      # PRECTOTCORR           MERRA-2 Precipitation Corrected (mm/hour) ;
+      # PRECSNOLAND           MERRA-2 Snow Precipitation Land (mm/hour) ;
+      # ALLSKY_SFC_SW_DWN     CERES SYN1deg All Sky Surface Shortwave Downward Irradiance (MJ/hr)
+      community = "ag",
+      lonlat = set_lonlat(zone),
+      pars = parameters,
+      dates = c("2001-01-01", "2022-12-31"),
+      temporal_api = "hourly",
+    ))
 
-    # Get the hourly average for each point of the day (0, 1, 2 ... 23) for each parameter
-    parameter_avg <- aggregate(
-                               subset(data, MO %in% season)[[parameter]],
-                               by = list(format(
-                                                as.POSIXct(
-                                                           paste(
-                                                                 subset(data, MO %in% season)$YEAR,
-                                                                 subset(data, MO %in% season)$MO,
-                                                                 subset(data, MO %in% season)$DY,
-                                                                 subset(data, MO %in% season)$HR,
-                                                                 sep = "-"
-                                                                ),
-                                                           format = "%Y-%m-%d-%H"
-                                                          ),
-                                                "%H"
-                                               )
-                                        ),
-                               FUN = mean
-                              )
-
-    # Rename the columns
-    colnames(parameter_avg) <- c("hour", paste(parameter, "avg", sep = "_"))
-
-    # Assign both columns to numeric
-    parameter_avg$hour <- as.numeric(parameter_avg$hour)
-    parameter_avg[[paste(parameter, "avg", sep = "_")]] <- as.numeric(parameter_avg[[paste(parameter, "avg", sep = "_")]])
-
-    # Standardize the data
-    parameter_avg[[paste(parameter, "avg", sep = "_")]] <- standardize_data(parameter_avg[[paste(parameter, "avg", sep = "_")]])
-
-    # Assign formating to the parameter column again
-    parameter_avg[[paste(parameter, "avg", sep = "_")]] <- as.numeric(parameter_avg[[paste(parameter, "avg", sep = "_")]])
-
-    return(parameter_avg)
+  return(data)
 }
 
 pearson_map_seasonal <- function(parameter1, parameter2) {
-  # If the results already exist, load them
-  if (file.exists(paste("output/Pearson_", parameter1, "_vs_", parameter2, ".RData", sep = ""))) {
-    # Load the data
-    print(paste("Data already exists for Parameter", parameter1, "and Parameter", parameter2, ". Loading the data..."))
-    load(paste("output/Pearson_", parameter1, "_vs_", parameter2, ".RData", sep = ""))
-
-    # Verify if the data is loaded
-    if (exists("nysiso1") && exists("nysiso2")) {
-      print(paste("Data loaded successfully for Zone", nysiso1$zone, "and Zone", nysiso2$zone))
-      
+  for (zone in zones) {
+    # Check to see if the data has already been downloaded
+    if(file.exists(paste("data/hourly/", zone, ".RData", sep = ""))) {
+      # Load the data
+      print(paste("Loading data for Zone", zone))
+      load(paste("data/hourly/", zone, ".RData", sep = ""))
     } else {
-      print(paste("Error loading the data for Zone", nysiso1$zone, "and Zone", nysiso2$zone))
+      # Make sure the data directory exists
+      dir.create("data/hourly", showWarnings = FALSE)
+
+      # Download the data
+      print(paste("Downloading data for Zone", zone))
+      data <- download_zone_data(zone)
+      save(data, file = paste("data/hourly/", zone, ".RData", sep = ""))
     }
-  } else {
-    nysiso1$lonlat <- set_lonlat(nysiso1$zone)
-    nysiso2$lonlat <- set_lonlat(nysiso2$zone)
+  }
+  
+  total_zones <- length(zones)
 
-    nysiso1$power <- data.frame(get_power(
-      # The community code for the region of interest
-      # ag - Agroclimatology Archive
-      # sb - Sustainable Buildings Archive
-      # re - Renewable Energy Archive
+  # Make a data frame to store the Pearson Correlation Coefficients
+  pearson_df <- data.frame(matrix(ncol = total_zones, nrow = total_zones))
 
-      # Parameters:
-      # WS2M                  MERRA-2 Wind Speed at 2 Meters (m/s) ;
-      # PRECTOTCORR           MERRA-2 Precipitation Corrected (mm/hour) ;
-      # PRECSNOLAND           MERRA-2 Snow Precipitation Land (mm/hour) ;
-      # ALLSKY_SFC_SW_DWN     CERES SYN1deg All Sky Surface Shortwave Downward Irradiance (MJ/hr)
-      community = "ag",
-      lonlat = nysiso1$lonlat,
-      pars = parameters,
-      dates = c("2001-01-01", "2022-12-31"),
-      temporal_api = "hourly",
-    ))
+  rownames(pearson_df) <- zones
+  colnames(pearson_df) <- zones
 
-    nysiso2$power <- data.frame(get_power(
-      # The community code for the region of interest
-      # ag - Agroclimatology Archive
-      # sb - Sustainable Buildings Archive
-      # re - Renewable Energy Archive
+  # Calculate the Pearson Correlation Coefficient
+  for (season in seasons) {
+    season <- toupper(season)
+    print(paste("Calculating Pearson Correlation Coefficient for the", paste(toupper(substring(season, 1, 1)), substring(tolower(season), 2), sep = ""), "Season"))
+    # Set the season
+    if (season == "WINTER") {
+        months <- c(12, 1, 2)
+    } else if (season == "SPRING") {
+        months <- c(3, 4, 5)
+    } else if (season == "SUMMER") {
+        months <- c(6, 7, 8)
+    } else if (season == "FALL") {
+        months <- c(9, 10, 11)
+    }
+    for (zone1 in zones) {
+      for (zone2 in zones) {
+        
+        # Skip if the two zones are the same
+        if (zone1 == zone2) {
+          pearson_df[zone1, zone2] <- 1
+          next
+        }
 
-      # Parameters:
-      # WS2M                  MERRA-2 Wind Speed at 2 Meters (m/s) ;
-      # PRECTOTCORR           MERRA-2 Precipitation Corrected (mm/hour) ;
-      # PRECSNOLAND           MERRA-2 Snow Precipitation Land (mm/hour) ;
-      # ALLSKY_SFC_SW_DWN     CERES SYN1deg All Sky Surface Shortwave Downward Irradiance (MJ/hr)
-      community = "ag",
-      lonlat = nysiso2$lonlat,
-      pars = parameters,
-      dates = c("2001-01-01", "2022-12-31"),
-      temporal_api = "hourly",
-    ))
+        #print(paste("Calculating Pearson Correlation Coefficient for", zone1, "and", zone2, "for the", season, "season"))
+
+        # Load the first variable's data
+        load(paste("data/hourly/", zone1, ".RData", sep = ""))
+        data1 <- data.frame(YEAR = data$YEAR, MO = data$MO, DY = data$DY, HR = data$HR, variable = data[[detect_component_variable(parameter1)]])
+        # Take only the data for the current season
+        data1 <- subset(data1, MO %in% months)
+        data1$variable <- as.numeric(data1$variable)
+
+        # Load the second variable's data
+        load(paste("data/hourly/", zone2, ".RData", sep = ""))
+        data2 <- data.frame(YEAR = data$YEAR, MO = data$MO, DY = data$DY, HR = data$HR, variable = data[[detect_component_variable(parameter2)]])
+        # Take only the data for the current season
+        data2 <- data2[data2$MO %in% months, ]
+        data2$variable <- as.numeric(data2$variable)
+
+        # Perform the Pearson Correlation Coefficient
+        pearson_df[zone1, zone2] <- round(cor(data1$variable, data2$variable, method = "pearson"), 2)
+        #print(paste("Pearson Correlation Coefficient for", zone1, "and", zone2, "for the", season, "season is", pearson_df[zone1, zone2]))
+      }
+    }
+    # Create a heatmap for the Pearson Correlation Coefficients
+    ggcorrplot(pearson_df,
+               title = paste("Correleation Coefficient Heatmap of", detect_parameter_name(detect_component_variable(parameter1)), "and", detect_parameter_name(detect_component_variable(parameter2)), "for the", paste(toupper(substring(season, 1, 1)), substring(tolower(season), 2), sep = ""), "Season"),
+               legend.title = "Pearson\nCorr.", lab=TRUE,
+               lab_col="black",
+               lab_size = 5, ggtheme = theme_gray,
+               colors = c("red", "white", "blue")) +
+                theme(legend.position = "bottom") +
+                theme(legend.key.height = unit(0.25, "in")) +
+                theme(legend.key.width = unit(2, "in")) +
+                theme(legend.title = element_text(size = 16, face = "italic", hjust = 0.5, margin = margin(t = 0, r = 10, b = 15, l = 0, unit = "pt"))) +
+                theme(legend.text = element_text(size = 12)) +
+                theme(plot.title = element_text(size = 20, face = "bold", hjust = 0.5))
+
+    # Save the heatmap
+    ggsave(paste("output/pearson_map_", detect_component_variable(parameter1), "_vs_", detect_component_variable(parameter2), "_", season, ".png", sep = ""), width = 18, height = 10, units = "in", dpi = 100)
+  }
 }
 
 if (confirm_all == "N") {
@@ -177,25 +192,23 @@ if (confirm_all == "N") {
     zone = component_prompt()
   )
 
-  pearson_map_seasonal(nysiso1, nysiso2)
+  pearson_map_seasonal(parameter1, parameter2)
   
 } else {
-    # Compare all the zones for all the components
-    completed_zones <- c()  # List to keep track of completed zones
-
-    for (zone1 in zones) {
-        nysiso1 <- list(zone = zone1)
-        for (zone2 in zones) {
-            nysiso2 <- list(zone = zone2)
-
-            # Skip if the two zones are the same or if the zone has already been completed
-            if (nysiso1$zone == nysiso2$zone || nysiso2$zone %in% completed_zones) {
-                next
-            }
-
-            pearson_map_seasonal(nysiso1, nysiso2)
-        }
-
-        completed_zones <- c(completed_zones, zone1) # Mark the zone as completed
+  completed_parameters <- c()
+  i <- 1
+  for (parameter1 in 1:length(parameters)) {
+    j <- 1
+    for (parameter2 in 1:length(parameters)) {
+      if (j %in% completed_parameters) {
+        j <- j + 1
+        next
+      }
+      print(paste("Calculating Pearson Correlation Coefficient for", detect_parameter_name(detect_component_variable(i)), "and", detect_parameter_name(detect_component_variable(j))))
+      pearson_map_seasonal(i, j)
+      j <- j + 1
     }
+    completed_parameters <- c(completed_parameters, i)
+    i <- i + 1
+  }
 }

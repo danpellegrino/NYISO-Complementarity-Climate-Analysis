@@ -27,6 +27,10 @@ detect_uninstalled_packages <- function() {
     install.packages("cowplot")
     library("cowplot")
   }
+  if(!require("ggcorrplot")) {
+    install.packages("ggcorrplot")
+    library("ggcorrplot")
+  }
 }
 
 netcdf_convert_prompt <- function() {
