@@ -4,9 +4,6 @@ citation("WaveletComp")
 
 source("code/SharedFunctions.R")
 
-# Check if the user needs to install the required packages
-detect_uninstalled_packages()
-
 # Do you need to convert the NetCDF files to CSV?
 netcdf_convert_prompt()
 
@@ -41,7 +38,7 @@ convert_to_monthly <- function(data, date, x) {
 
 plot_power <- function(my.w, title) {
   # Plot the power
-  maximum.level = 1.001 * max(my.w$Power.avg, my.w$Power.avg)
+  maximum.level <- 1.001 * max(my.w$Power.avg, my.w$Power.avg)
   wt.avg(my.w, main = title, maximum.level = maximum.level)
 }
 
@@ -62,10 +59,12 @@ average_power <- function(nysiso) {
     # Set the file name
     file <- paste("output/AveragePower_", nysiso$zone, "_", nysiso$component$variable, ".png", sep = "")
   }
-  title <- paste("Average Power of Zone",
-                 nysiso$zone, nysiso$component$name)
+  title <- paste(
+    "Average Power of Zone",
+    nysiso$zone, nysiso$component$name
+  )
 
-  #Perform the wavelet analysis
+  # Perform the wavelet analysis
   my.w <- analyze.wavelet(nysiso_data, "variable")
 
   png(file, width = 3.47, height = 1.84, units = "in", res = 1000, pointsize = 3)
@@ -73,18 +72,18 @@ average_power <- function(nysiso) {
   # Produce the plot
   plot_power(my.w, title)
 
-  dev.off()  
+  dev.off()
 }
 
 if (confirm_all == "N") {
-    nysiso <- list(zone = iso_zone_prompt(), component = detect_component(component_prompt()))
+  nysiso <- list(zone = iso_zone_prompt(), component = detect_component(component_prompt()))
 
-    average_power(nysiso)
+  average_power(nysiso)
 } else {
-    for (zone in zones) {
-        for (component in components) {
-            nysiso <- list(zone = zone, component = detect_component(component))
-            average_power(nysiso)
-        }
+  for (zone in zones) {
+    for (component in components) {
+      nysiso <- list(zone = zone, component = detect_component(component))
+      average_power(nysiso)
     }
+  }
 }

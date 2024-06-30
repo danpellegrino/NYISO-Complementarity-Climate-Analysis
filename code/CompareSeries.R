@@ -4,9 +4,6 @@ citation("WaveletComp")
 
 source("code/SharedFunctions.R")
 
-# Check if the user needs to install the required packages
-detect_uninstalled_packages()
-
 # Do you need to convert the NetCDF files to CSV?
 netcdf_convert_prompt()
 
@@ -20,7 +17,8 @@ average_data <- function(data, date) {
 
   # Aggregate the data by day and month
   data <- aggregate(data[, 2:ncol(data)],
-                     by = list(data$day, data$month), FUN = mean)
+    by = list(data$day, data$month), FUN = mean
+  )
 
   # Remove the extra day and month columns
   data <- data[, -c(1, 2)]
@@ -62,25 +60,34 @@ compare_series <- function(nys1, nys2) {
   nys2_data$variable <- smooth_data(nys2_data$variable)
   combined_data$variable <- smooth_data(combined_data$variable)
 
-  svg(paste("output/TimeSeries_",
-            nys1$zone, "_", nys1$component$variable, "_vs_",
-            nys2$zone, "_", nys2$component$variable, ".svg", sep = ""),
-      width = 8, height = 4.4, pointsize = 6)
+  svg(
+    paste("output/TimeSeries_",
+      nys1$zone, "_", nys1$component$variable, "_vs_",
+      nys2$zone, "_", nys2$component$variable, ".svg",
+      sep = ""
+    ),
+    width = 8, height = 4.4, pointsize = 6
+  )
 
   # Plot the two graphs together
-  plot(nys1_data$variable, type = "l", col = "blue",
-      xlab = "Day of the Year", ylab = "Normalized Value",
-      ylim = c(min(nys1_data$variable, nys2_data$variable, combined_data$variable), max(nys1_data$variable, nys2_data$variable, combined_data$variable)),
-      main = paste("Zone", nys1$zone, nys1$component$name,
-                    "against Zone", nys2$zone, nys2$component$name))
+  plot(nys1_data$variable,
+    type = "l", col = "blue",
+    xlab = "Day of the Year", ylab = "Normalized Value",
+    ylim = c(min(nys1_data$variable, nys2_data$variable, combined_data$variable), max(nys1_data$variable, nys2_data$variable, combined_data$variable)),
+    main = paste(
+      "Zone", nys1$zone, nys1$component$name,
+      "against Zone", nys2$zone, nys2$component$name
+    )
+  )
 
   lines(nys2_data$variable, col = "red")
 
   lines(combined_data$variable, col = "purple", lty = 2)
 
   legend("topleft",
-        legend = c(nys1$component$name, nys2$component$name, "Combined Wavelet"),
-        col = c("blue", "red", "purple"), lty = c(1, 1, 2))
+    legend = c(nys1$component$name, nys2$component$name, "Combined Wavelet"),
+    col = c("blue", "red", "purple"), lty = c(1, 1, 2)
+  )
 
   dev.off()
 }
@@ -93,7 +100,7 @@ if (confirm_all == "N") {
   compare_series(nys1, nys2)
 } else {
   # Compare all the zones for all the components
-  completed_zones <- c()  # List to keep track of completed zones
+  completed_zones <- c() # List to keep track of completed zones
 
   for (zone1 in zones) {
     for (component1 in components) {
@@ -112,7 +119,7 @@ if (confirm_all == "N") {
         }
       }
 
-      completed_zones <- c(completed_zones, zone1)  # Mark the zone as completed
+      completed_zones <- c(completed_zones, zone1) # Mark the zone as completed
     }
   }
 }

@@ -4,9 +4,6 @@ citation("WaveletComp")
 
 source("code/SharedFunctions.R")
 
-# Check if the user needs to install the required packages
-detect_uninstalled_packages()
-
 # Do you need to convert the NetCDF files to CSV?
 netcdf_convert_prompt()
 
@@ -46,9 +43,10 @@ daily_stdev <- function(data, date, x) {
   stats <- data.frame(day = mean$Group.1, mean = mean$x, stdev = stdev$x)
 
   data[, x] <- ifelse(stats[match(format(data[, date], "%j"), stats$day), "stdev"] == 0,
-                      0,
-                      (data[, x] - stats[match(format(data[, date], "%j"), stats$day), "mean"]) /
-                      stats[match(format(data[, date], "%j"), stats$day), "stdev"])
+    0,
+    (data[, x] - stats[match(format(data[, date], "%j"), stats$day), "mean"]) /
+      stats[match(format(data[, date], "%j"), stats$day), "stdev"]
+  )
 
   return(data)
 }
@@ -60,9 +58,10 @@ monthly_stdev <- function(data, date, x) {
   stats <- data.frame(month = mean$Group.1, mean = mean$x, stdev = stdev$x)
 
   data[, x] <- ifelse(stats[match(format(data[, date], "%m"), stats$month), "stdev"] == 0,
-                      0,
-                      (data[, x] - stats[match(format(data[, date], "%m"), stats$month), "mean"]) /
-                      stats[match(format(data[, date], "%m"), stats$month), "stdev"])
+    0,
+    (data[, x] - stats[match(format(data[, date], "%m"), stats$month), "mean"]) /
+      stats[match(format(data[, date], "%m"), stats$month), "stdev"]
+  )
 
   return(data)
 }
@@ -77,7 +76,7 @@ analyze_coherency <- function(data1, variable1, data2, variable2, monthly) {
     upper_bound <- 365 * years
   }
   my_wc <- analyze.coherency(my_data, upperPeriod = upper_bound)
-  
+
   return(my_wc)
 }
 
@@ -88,10 +87,11 @@ plot_wave <- function(my_wc, title, index.ticks, index.labels, monthly) {
     period_lab <- "Period (days)"
   }
   wc.image(my_wc,
-           main = title,
-           timelab = "Date (year)",
-           periodlab = period_lab,
-           spec.time.axis = list(at = index.ticks, labels = index.labels))
+    main = title,
+    timelab = "Date (year)",
+    periodlab = period_lab,
+    spec.time.axis = list(at = index.ticks, labels = index.labels)
+  )
 }
 
 wavelet_analysis <- function(nys1, nys2) {
@@ -110,33 +110,39 @@ wavelet_analysis <- function(nys1, nys2) {
     nys2_data <- convert_to_monthly(nys2_data, "date", "variable")
 
     # standard deviation
-    #nys1_data <- monthly_stdev(nys1_data, "date", "variable")
-    #nys2_data <- monthly_stdev(nys2_data, "date", "variable")
+    # nys1_data <- monthly_stdev(nys1_data, "date", "variable")
+    # nys2_data <- monthly_stdev(nys2_data, "date", "variable")
 
-    index.ticks <- seq(12*11, nrow(nys1_data), by = 12*65)
+    index.ticks <- seq(12 * 11, nrow(nys1_data), by = 12 * 65)
     index.labels <- format(nys1_data$date, "%Y")[index.ticks]
 
     file <- paste("output/WaveletCoherence_", nys1$zone, "_", nys1$component$variable,
-                  "_vs_", nys2$zone, "_", nys2$component$variable, "_monthly.svg", sep = "")
+      "_vs_", nys2$zone, "_", nys2$component$variable, "_monthly.svg",
+      sep = ""
+    )
   } else {
     # standard deviation
-    #nys1_data <- daily_stdev(nys1_data, "date", "variable")
-    #nys2_data <- daily_stdev(nys2_data, "date", "variable")
+    # nys1_data <- daily_stdev(nys1_data, "date", "variable")
+    # nys2_data <- daily_stdev(nys2_data, "date", "variable")
 
-    index.ticks <- seq(365*11, nrow(nys1_data), by = 365*65)
+    index.ticks <- seq(365 * 11, nrow(nys1_data), by = 365 * 65)
     index.labels <- format(nys1_data$date, "%Y")[index.ticks]
 
     file <- paste("output/WaveletCoherence_", nys1$zone, "_", nys1$component$variable,
-                  "_vs_", nys2$zone, "_", nys2$component$variable, ".svg", sep = "")
+      "_vs_", nys2$zone, "_", nys2$component$variable, ".svg",
+      sep = ""
+    )
   }
 
-  title <- paste("Wavelet Analysis of Zone",
-                 nys1$zone, nys1$component$name,
-                 "and Zone", nys2$zone, nys2$component$name)
+  title <- paste(
+    "Wavelet Analysis of Zone",
+    nys1$zone, nys1$component$name,
+    "and Zone", nys2$zone, nys2$component$name
+  )
 
   # Perform the wavelet analysis
   my_wc <- analyze_coherency(nys1_data, "variable", nys2_data, "variable", monthly)
-  
+
   svg(file, width = 8, height = 4.4, pointsize = 6)
 
   # Produce the plot
@@ -152,7 +158,7 @@ if (confirm_all == "N") {
   wavelet_analysis(nys1, nys2)
 } else {
   # Compare all the zones for all the components
-  completed_zones <- c()  # List to keep track of completed zones
+  completed_zones <- c() # List to keep track of completed zones
 
   for (zone1 in zones) {
     for (component1 in components) {
@@ -171,7 +177,7 @@ if (confirm_all == "N") {
         }
       }
 
-      completed_zones <- c(completed_zones, zone1)  # Mark the zone as completed
+      completed_zones <- c(completed_zones, zone1) # Mark the zone as completed
     }
   }
 }

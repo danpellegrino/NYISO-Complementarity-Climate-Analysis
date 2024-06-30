@@ -1,0 +1,7 @@
+library("reticulate")
+library("WaveletComp")
+library("nasapower")
+library("ggplot2")
+library("cowplot")
+library("ggcorrplot")
+library("here")

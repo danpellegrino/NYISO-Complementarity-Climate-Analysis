@@ -5,34 +5,6 @@ zones <- c("A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K")
 # Using the following components, goes from 1 to 4
 components <- c("1", "2", "3", "4")
 
-detect_uninstalled_packages <- function() {
-  # Check if the user needs to install the required packages
-  if (!require("reticulate")) {
-    install.packages("reticulate")
-    library("reticulate")
-  }
-  if (!require("WaveletComp")) {
-    install.packages("WaveletComp")
-    library("WaveletComp")
-  }
-  if (!require("nasapower")) {
-    install.packages("nasapower")
-    library("nasapower")
-  }
-  if(!require("ggplot2")) {
-    install.packages("ggplot2")
-    library("ggplot2")
-  }
-  if(!require("cowplot")) {
-    install.packages("cowplot")
-    library("cowplot")
-  }
-  if(!require("ggcorrplot")) {
-    install.packages("ggcorrplot")
-    library("ggcorrplot")
-  }
-}
-
 netcdf_convert_prompt <- function() {
   # Ask the user if they need to convert the NetCDF files to CSV
   convert <- ""
@@ -73,19 +45,21 @@ all_zones_prompt <- function() {
 iso_zone_prompt <- function() {
   # Ask the user which NYISO Zone they want to analyze
   nyszone <- ""
-  nyszone_prompt <- paste("Enter the NYISO Zone for analyzing:",
-                          "\nA (West)",
-                          "\nB (Genessee)",
-                          "\nC (Central)",
-                          "\nD (North)",
-                          "\nE (Mohawk Valley)",
-                          "\nF (Capital)",
-                          "\nG (Hudson Valley)",
-                          "\nH (Millwood)",
-                          "\nI (Dunwoodie)",
-                          "\nJ (NYC)",
-                          "\nK (Long Island)",
-                          "\n  Option: ")
+  nyszone_prompt <- paste(
+    "Enter the NYISO Zone for analyzing:",
+    "\nA (West)",
+    "\nB (Genessee)",
+    "\nC (Central)",
+    "\nD (North)",
+    "\nE (Mohawk Valley)",
+    "\nF (Capital)",
+    "\nG (Hudson Valley)",
+    "\nH (Millwood)",
+    "\nI (Dunwoodie)",
+    "\nJ (NYC)",
+    "\nK (Long Island)",
+    "\n  Option: "
+  )
 
   while (!(nyszone %in% c(zones))) {
     nyszone <- readline(prompt = nyszone_prompt)
@@ -103,12 +77,14 @@ iso_zone_prompt <- function() {
 component_prompt <- function() {
   # Ask the user which component they want to analyze
   component <- ""
-  component_prompt <- paste("What component do you want to analyze?",
-                            "\n 1. Wind Speed",
-                            "\n 2. Precipitation",
-                            "\n 3. Snowfall",
-                            "\n 4. Solar Radiation",
-                            "\n  Option: ")
+  component_prompt <- paste(
+    "What component do you want to analyze?",
+    "\n 1. Wind Speed",
+    "\n 2. Precipitation",
+    "\n 3. Snowfall",
+    "\n 4. Solar Radiation",
+    "\n  Option: "
+  )
   while (!(component %in% c(components))) {
     component <- readline(prompt = component_prompt)
     component <- as.integer(component)
@@ -122,28 +98,30 @@ component_prompt <- function() {
 }
 
 detect_component_variable <- function(component) {
-  if (component == 1)
+  if (component == 1) {
     component_variable <- "sfcWind"
-  else if (component == 2)
+  } else if (component == 2) {
     component_variable <- "pr"
-  else if (component == 3)
+  } else if (component == 3) {
     component_variable <- "prsn"
-  else if (component == 4)
+  } else if (component == 4) {
     component_variable <- "rsds"
-  
+  }
+
   return(component_variable)
 }
 
 detect_component_name <- function(component) {
-  if (component == 1)
+  if (component == 1) {
     component_name <- "Wind Speed"
-  else if (component == 2)
+  } else if (component == 2) {
     component_name <- "Precipitation"
-  else if (component == 3)
+  } else if (component == 3) {
     component_name <- "Snowfall Flux"
-  else if (component == 4)
+  } else if (component == 4) {
     component_name <- "Solar Radiation"
-  
+  }
+
   return(component_name)
 }
 
@@ -155,10 +133,10 @@ detect_component <- function(component) {
 }
 
 load_file <- function(zone, component_variable) {
-   # Load the data
-   file <- paste(directory, component_variable, "/", "_zone_", zone, ".csv", sep = "")
+  # Load the data
+  file <- paste(directory, component_variable, "/", "_zone_", zone, ".csv", sep = "")
 
-   return(file)
+  return(file)
 }
 
 create_data_frame <- function(place) {
@@ -180,6 +158,6 @@ standardize_data <- function(data) {
   if (is.na(data[1])) {
     data <- rep(0, length(data))
   }
-  
+
   return(data)
 }

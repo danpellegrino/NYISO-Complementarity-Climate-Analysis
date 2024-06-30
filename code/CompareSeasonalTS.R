@@ -4,9 +4,6 @@ citation("WaveletComp")
 
 source("code/SharedFunctions.R")
 
-# Check if the user needs to install the required packages
-detect_uninstalled_packages()
-
 # Do you need to convert the NetCDF files to CSV?
 netcdf_convert_prompt()
 
@@ -30,15 +27,16 @@ average_season_data <- function(data, date, season) {
   } else if (season == "Autumn") {
     # Autumn is from September to November
     data <- data[data$month %in% c(9, 10, 11), ]
-  } 
+  }
 
   # Aggregate the data by day and month
   data <- aggregate(data[, 2:ncol(data)],
-                    by = list(data$day, data$month), FUN = mean)
+    by = list(data$day, data$month), FUN = mean
+  )
 
   # Remove the extra day and month columns
   data <- data[, -c(1, 2)]
-  
+
   print(data)
 
   return(data)
@@ -65,7 +63,7 @@ compare_seasonal_series <- function(nys1, nys2) {
     nys2_data <- create_data_frame(nys2)
 
     print(paste("Computing Wavelet Transform for Zone", nys1$zone, nys1$component$name, "and Zone", nys2$zone, nys2$component$name, "for the", season, "Season"))
-  
+
     # Average out the data from x amount of years to one year
     nys1_data <- average_season_data(nys1_data, "date", season)
     nys2_data <- average_season_data(nys2_data, "date", season)
@@ -73,23 +71,31 @@ compare_seasonal_series <- function(nys1, nys2) {
     # Standardize the data
     nys1_data$variable <- standardize_data(nys1_data$variable)
     nys2_data$variable <- standardize_data(nys2_data$variable)
-    
+
     # Smooth the data
     nys1_data$variable <- smooth_data(nys1_data$variable)
     nys2_data$variable <- smooth_data(nys2_data$variable)
 
-    svg(paste("output/TimeSeries_",
-                nys1$zone, "_", nys1$component$variable, "_vs_",
-                nys2$zone, "_", nys2$component$variable, "_", season, ".svg", sep = ""),
-        width = 8, height = 4.4, pointsize = 6)
+    svg(
+      paste("output/TimeSeries_",
+        nys1$zone, "_", nys1$component$variable, "_vs_",
+        nys2$zone, "_", nys2$component$variable, "_", season, ".svg",
+        sep = ""
+      ),
+      width = 8, height = 4.4, pointsize = 6
+    )
 
     # Plot the two graphs together
-    plot(nys1_data$variable, type = "l", col = "blue",
-        xlab = "Day of the Year", ylab = "Normalized Value",
-        ylim = c(min(nys1_data$variable, nys2_data$variable), max(nys1_data$variable, nys2_data$variable)),
-        main = paste("Zone", nys1$zone, nys1$component$name,
-                        "against Zone", nys2$zone, nys2$component$name, "for the", season, "season"),
-        xaxt = "n")  # Remove x-axis labels
+    plot(nys1_data$variable,
+      type = "l", col = "blue",
+      xlab = "Day of the Year", ylab = "Normalized Value",
+      ylim = c(min(nys1_data$variable, nys2_data$variable), max(nys1_data$variable, nys2_data$variable)),
+      main = paste(
+        "Zone", nys1$zone, nys1$component$name,
+        "against Zone", nys2$zone, nys2$component$name, "for the", season, "season"
+      ),
+      xaxt = "n"
+    ) # Remove x-axis labels
 
     # Create a new date column for labeling the x-axis using the month and day
     nys1_data$date <- as.Date(paste("2020-", nys1_data$month, "-", nys1_data$day, sep = ""))
@@ -97,11 +103,12 @@ compare_seasonal_series <- function(nys1, nys2) {
     # Add custom x-axis labels
     axis(1, at = seq(1, length(nys1_data$variable), by = 30), labels = format(as.Date(nys1_data$date[seq(1, length(nys1_data$variable), by = 30)]), "%m/%d"))
 
-    lines(nys2_data$variable, col = "red")  
+    lines(nys2_data$variable, col = "red")
 
     legend("topleft",
-            legend = c(nys1$component$name, nys2$component$name),
-            col = c("blue", "red"), lty = c(1, 1))
+      legend = c(nys1$component$name, nys2$component$name),
+      col = c("blue", "red"), lty = c(1, 1)
+    )
 
     dev.off()
   }
@@ -115,7 +122,7 @@ if (confirm_all == "N") {
   compare_seasonal_series(nys1, nys2)
 } else {
   # Compare all the zones for all the components
-  completed_zones <- c()  # List to keep track of completed zones
+  completed_zones <- c() # List to keep track of completed zones
 
   for (zone1 in zones) {
     for (component1 in components) {
@@ -134,7 +141,7 @@ if (confirm_all == "N") {
         }
       }
 
-      completed_zones <- c(completed_zones, zone1)  # Mark the zone as completed
+      completed_zones <- c(completed_zones, zone1) # Mark the zone as completed
     }
   }
 }

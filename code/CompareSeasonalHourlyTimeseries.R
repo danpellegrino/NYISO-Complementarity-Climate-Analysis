@@ -1,8 +1,5 @@
 source("code/SharedFunctions.R")
 
-# Check if the user needs to install the required packages
-detect_uninstalled_packages()
-
 # https://github.com/ropensci/nasapower
 library("nasapower")
 library("ggplot2")
