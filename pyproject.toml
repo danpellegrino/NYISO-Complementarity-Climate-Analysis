@@ -1,0 +1,18 @@
+[tool.poetry]
+name = "nyiso-complementarity-climate-analysis"
+version = "0.1.0"
+description = "Exploring Signal Processing Techniques with the WaveletComp Package in R"
+authors = ["Daniel Pellegrino <danpellegrino1@gmail.com>"]
+license = "MIT"
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+netCDF4 = "^1.7.1.post1"
+pandas = "^2.2.2"
+numpy = "^2.0.0"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
