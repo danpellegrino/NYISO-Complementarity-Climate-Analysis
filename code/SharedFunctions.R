@@ -1,3 +1,7 @@
+#' @title Shared Functions
+#' @description Shared functions for the analysis of the weather data.
+#' @author [Daniel Pellegrino](danieljpellegrino.com)
+
 # Set the data directory
 directory <- "data/MRI-AGCM3.2/"
 # Using the following NYISO Zones, goes from A to K
@@ -5,6 +9,24 @@ zones <- c("A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K")
 # Using the following components, goes from 1 to 4
 components <- c("1", "2", "3", "4")
 
+#' @title NetCDF Convert Prompt
+#' @description Ask the user if they need to convert the NetCDF files to CSV (Y/N).
+#' @return A character string with the user's response.
+#' @examples
+#' answer <- netcdf_convert_prompt()
+#' print(answer)
+#' @export
+#' @importFrom base return
+#' @importFrom base if
+#' @importFrom base else
+#' @importFrom base cat
+#' @importFrom base readline
+#' @importFrom base as.character
+#' @importFrom base toupper
+#' @importFrom base c
+#' @importFrom reticulate py_run_file
+#' @importFrom base while
+#' @importFrom base paste
 netcdf_convert_prompt <- function() {
   # Ask the user if they need to convert the NetCDF files to CSV
   convert <- ""
@@ -26,6 +48,23 @@ netcdf_convert_prompt <- function() {
   return(convert)
 }
 
+#' @title All Zones Prompt
+#' @description Ask the user if they want to compare all the zones (Y/N).
+#' @return A character string with the user's response.
+#' @examples
+#' answer <- all_zones_prompt()
+#' print(answer)
+#' @export
+#' @importFrom base return
+#' @importFrom base if
+#' @importFrom base else
+#' @importFrom base cat
+#' @importFrom base readline
+#' @importFrom base as.character
+#' @importFrom base toupper
+#' @importFrom base c
+#' @importFrom base while
+#' @importFrom base paste
 all_zones_prompt <- function() {
   # Ask the user if they want to compare all the zones
   all_zones <- ""
@@ -42,6 +81,23 @@ all_zones_prompt <- function() {
   return(all_zones)
 }
 
+#' @title NYISO Zone Prompt
+#' @description Ask the user which NYISO Zone they want to analyze (A to K).
+#' @return A character string with the user's response.
+#' @examples
+#' answer <- nyszone_prompt()
+#' print(answer)
+#' @export
+#' @importFrom base return
+#' @importFrom base if
+#' @importFrom base else
+#' @importFrom base cat
+#' @importFrom base paste
+#' @importFrom base readline
+#' @importFrom base as.character
+#' @importFrom base toupper
+#' @importFrom base c
+#' @importFrom base while
 iso_zone_prompt <- function() {
   # Ask the user which NYISO Zone they want to analyze
   nyszone <- ""
@@ -74,6 +130,22 @@ iso_zone_prompt <- function() {
   return(nyszone)
 }
 
+#' @title Component Prompt
+#' @description Ask the user which component they want to analyze.
+#' @return A character string with the user's response (1, 2, 3, or 4)
+#' @examples
+#' answer <- component_prompt()
+#' print(answer)
+#' @export
+#' @importFrom base return
+#' @importFrom base if
+#' @importFrom base else
+#' @importFrom base cat
+#' @importFrom base paste
+#' @importFrom base readline
+#' @importFrom base as.integer
+#' @importFrom base c
+#' @importFrom base while
 component_prompt <- function() {
   # Ask the user which component they want to analyze
   component <- ""
@@ -97,6 +169,18 @@ component_prompt <- function() {
   return(component)
 }
 
+#' @title Detect Component Variable
+#' @description Detect the component variable based on the component number.
+#' @param component An integer with the component number.
+#' @return A character string with the component variable.
+#' @examples
+#' component_variable <- detect_component_variable(1)
+#' print(component_variable)
+#' [1] "sfcWind"
+#' @export
+#' @importFrom base return
+#' @importFrom base if
+#' @importFrom base else
 detect_component_variable <- function(component) {
   if (component == 1) {
     component_variable <- "sfcWind"
@@ -111,6 +195,18 @@ detect_component_variable <- function(component) {
   return(component_variable)
 }
 
+#' @title Detect Component Name
+#' @description Detect the component name based on the component number.
+#' @param component An integer with the component number.
+#' @return A character string with the component name.
+#' @examples
+#' component_name <- detect_component_name(1)
+#' print(component_name)
+#' [1] "Wind Speed"
+#' @export
+#' @importFrom base return
+#' @importFrom base if
+#' @importFrom base else
 detect_component_name <- function(component) {
   if (component == 1) {
     component_name <- "Wind Speed"
@@ -125,6 +221,19 @@ detect_component_name <- function(component) {
   return(component_name)
 }
 
+#' @title Detect Component
+#' @description Detect the component variable and name based on the component number.
+#' @param component An integer with the component number.
+#' @return A list with the component variable and name.
+#' @examples
+#' component <- detect_component(1)
+#' print(component$variable)
+#' [1] "sfcWind"
+#' print(component$name)
+#' [1] "Wind Speed"
+#' @export
+#' @importFrom base list
+#' @importFrom base return
 detect_component <- function(component) {
   component_variable <- detect_component_variable(component)
   component_name <- detect_component_name(component)
@@ -132,6 +241,17 @@ detect_component <- function(component) {
   return(list(variable = component_variable, name = component_name))
 }
 
+#' @title Load File
+#' @description Load the file based on the zone and component variable.
+#' @param zone A character string with the NYISO Zone.
+#' @param component_variable A character string with the component variable.
+#' @return A character string with the file path.
+#' @examples
+#' file <- load_file("A", "sfcWind")
+#' print(file)
+#' @export
+#' @importFrom base paste
+#' @importFrom base return
 load_file <- function(zone, component_variable) {
   # Load the data
   file <- paste(directory, component_variable, "/", "_zone_", zone, ".csv", sep = "")
@@ -139,6 +259,20 @@ load_file <- function(zone, component_variable) {
   return(file)
 }
 
+#' @title Create Data Frame
+#' @description Create a data frame with the date and the weather variable.
+#' @param place A list with the file path.
+#' @return A data frame with the date and the weather variable.
+#' @examples
+#' data <- create_data_frame(list(file = "data/MRI-AGCM3.2/sfcWind/_zone_A.csv"))
+#' print(data)
+#' @export
+#' @importFrom utils read.csv
+#' @importFrom base data.frame
+#' @importFrom base as.Date
+#' @importFrom base as.numeric
+#' @importFrom base as.character
+#' @importFrom base return
 create_data_frame <- function(place) {
   # Read from the data
   # Create a data frame with the first column as the date,
@@ -151,6 +285,20 @@ create_data_frame <- function(place) {
   return(data)
 }
 
+#' @title Standardize Data
+#' @description Standardize the data using the scale function.
+#' @param data A numeric vector with the data.
+#' @return A numeric vector with the standardized data.
+#' @examples
+#' data <- c(1, 2, 3, 4, 5)
+#' standardized_data <- standardize_data(data)
+#' print(standardized_data)
+#' @export
+#' @importFrom base scale
+#' @importFrom base is.na
+#' @importFrom base rep
+#' @importFrom base length
+#' @importFrom base return
 standardize_data <- function(data) {
   data <- scale(data, scale = TRUE)
 
