@@ -28,24 +28,24 @@ components <- c("1", "2", "3", "4")
 #' @importFrom base while
 #' @importFrom base paste
 netcdf_convert_prompt <- function() {
-  # Ask the user if they need to convert the NetCDF files to CSV
-  convert <- ""
-  convert_prompt <- "Do you need to convert the NetCDF files to CSV? (Y/N): "
-  while (!(convert %in% c("Y", "N"))) {
-    convert <- readline(prompt = convert_prompt)
-    convert <- as.character(convert)
-    convert <- toupper(convert)
-    if (!(convert %in% c("Y", "N"))) {
-      cat("\n", convert, "is not a valid option.\n\n")
+    # Ask the user if they need to convert the NetCDF files to CSV
+    convert <- ""
+    convert_prompt <- "Do you need to convert the NetCDF files to CSV? (Y/N): "
+    while (!(convert %in% c("Y", "N"))) {
+        convert <- readline(prompt = convert_prompt)
+        convert <- as.character(convert)
+        convert <- toupper(convert)
+        if (!(convert %in% c("Y", "N"))) {
+            cat("\n", convert, "is not a valid option.\n\n")
+        }
     }
-  }
+      
+    if (convert == "Y") {
+        # Convert the NetCDF files to CSV
+        py_run_file("code/ExtractData.py")
+    }
 
-  if (convert == "Y") {
-    # Convert the NetCDF files to CSV
-    py_run_file("code/ExtractData.py")
-  }
-
-  return(convert)
+    return(convert)
 }
 
 #' @title All Zones Prompt
@@ -66,19 +66,19 @@ netcdf_convert_prompt <- function() {
 #' @importFrom base while
 #' @importFrom base paste
 all_zones_prompt <- function() {
-  # Ask the user if they want to compare all the zones
-  all_zones <- ""
-  all_zones_prompt <- "Do you want to compare all the zones? (Y/N): "
-  while (!(all_zones %in% c("Y", "N"))) {
-    all_zones <- readline(prompt = all_zones_prompt)
-    all_zones <- as.character(all_zones)
-    all_zones <- toupper(all_zones)
-    if (!(all_zones %in% c("Y", "N"))) {
-      cat("\n", all_zones, "is not a valid option.\n\n")
+    # Ask the user if they want to compare all the zones
+    all_zones <- ""
+    all_zones_prompt <- "Do you want to compare all the zones? (Y/N): "
+    while (!(all_zones %in% c("Y", "N"))) {
+        all_zones <- readline(prompt = all_zones_prompt)
+        all_zones <- as.character(all_zones)
+        all_zones <- toupper(all_zones)
+        if (!(all_zones %in% c("Y", "N"))) {
+            cat("\n", all_zones, "is not a valid option.\n\n")
+        }
     }
-  }
-
-  return(all_zones)
+    
+    return(all_zones)
 }
 
 #' @title NYISO Zone Prompt
@@ -99,35 +99,35 @@ all_zones_prompt <- function() {
 #' @importFrom base c
 #' @importFrom base while
 iso_zone_prompt <- function() {
-  # Ask the user which NYISO Zone they want to analyze
-  nyszone <- ""
-  nyszone_prompt <- paste(
-    "Enter the NYISO Zone for analyzing:",
-    "\nA (West)",
-    "\nB (Genessee)",
-    "\nC (Central)",
-    "\nD (North)",
-    "\nE (Mohawk Valley)",
-    "\nF (Capital)",
-    "\nG (Hudson Valley)",
-    "\nH (Millwood)",
-    "\nI (Dunwoodie)",
-    "\nJ (NYC)",
-    "\nK (Long Island)",
-    "\n  Option: "
-  )
+    # Ask the user which NYISO Zone they want to analyze
+    nyszone <- ""
+    nyszone_prompt <- paste(
+        "Enter the NYISO Zone for analyzing:",
+        "\nA (West)",
+        "\nB (Genessee)",
+        "\nC (Central)",
+        "\nD (North)",
+        "\nE (Mohawk Valley)",
+        "\nF (Capital)",
+        "\nG (Hudson Valley)",
+        "\nH (Millwood)",
+        "\nI (Dunwoodie)",
+        "\nJ (NYC)",
+        "\nK (Long Island)",
+        "\n  Option: "
+    )
 
-  while (!(nyszone %in% c(zones))) {
-    nyszone <- readline(prompt = nyszone_prompt)
-    nyszone <- as.character(nyszone)
-    nyszone <- toupper(nyszone)
-    if (!(nyszone %in% c(zones))) {
-      cat("\n", nyszone, "is not a valid NYISO Zone.\n\n")
+    while (!(nyszone %in% c(zones))) {
+        nyszone <- readline(prompt = nyszone_prompt)
+        nyszone <- as.character(nyszone)
+        nyszone <- toupper(nyszone)
+        if (!(nyszone %in% c(zones))) {
+            cat("\n", nyszone, "is not a valid NYISO Zone.\n\n")
+        }
     }
-  }
-  cat("\n")
+    cat("\n")
 
-  return(nyszone)
+    return(nyszone)
 }
 
 #' @title Component Prompt
@@ -147,26 +147,26 @@ iso_zone_prompt <- function() {
 #' @importFrom base c
 #' @importFrom base while
 component_prompt <- function() {
-  # Ask the user which component they want to analyze
-  component <- ""
-  component_prompt <- paste(
-    "What component do you want to analyze?",
-    "\n 1. Wind Speed",
-    "\n 2. Precipitation",
-    "\n 3. Snowfall",
-    "\n 4. Solar Radiation",
-    "\n  Option: "
-  )
-  while (!(component %in% c(components))) {
-    component <- readline(prompt = component_prompt)
-    component <- as.integer(component)
-    if (!(component %in% c(components))) {
-      cat("\n", component, "is not a valid option.\n\n")
+    # Ask the user which component they want to analyze
+    component <- ""
+    component_prompt <- paste(
+        "What component do you want to analyze?",
+        "\n 1. Wind Speed",
+        "\n 2. Precipitation",
+        "\n 3. Snowfall",
+        "\n 4. Solar Radiation",
+        "\n  Option: "
+    )
+    while (!(component %in% c(components))) {
+        component <- readline(prompt = component_prompt)
+        component <- as.integer(component)
+        if (!(component %in% c(components))) {
+            cat("\n", component, "is not a valid option.\n\n")
+        }
     }
-  }
-  cat("\n")
+    cat("\n")
 
-  return(component)
+    return(component)
 }
 
 #' @title Detect Component Variable
@@ -182,17 +182,17 @@ component_prompt <- function() {
 #' @importFrom base if
 #' @importFrom base else
 detect_component_variable <- function(component) {
-  if (component == 1) {
-    component_variable <- "sfcWind"
-  } else if (component == 2) {
-    component_variable <- "pr"
-  } else if (component == 3) {
-    component_variable <- "prsn"
-  } else if (component == 4) {
-    component_variable <- "rsds"
-  }
+    if (component == 1) {
+        component_variable <- "sfcWind"
+    } else if (component == 2) {
+        component_variable <- "pr"
+    } else if (component == 3) {
+        component_variable <- "prsn"
+    } else if (component == 4) {
+        component_variable <- "rsds"
+    }
 
-  return(component_variable)
+    return(component_variable)
 }
 
 #' @title Detect Component Name
@@ -208,17 +208,17 @@ detect_component_variable <- function(component) {
 #' @importFrom base if
 #' @importFrom base else
 detect_component_name <- function(component) {
-  if (component == 1) {
-    component_name <- "Wind Speed"
-  } else if (component == 2) {
-    component_name <- "Precipitation"
-  } else if (component == 3) {
-    component_name <- "Snowfall Flux"
-  } else if (component == 4) {
-    component_name <- "Solar Radiation"
-  }
+    if (component == 1) {
+        component_name <- "Wind Speed"
+    } else if (component == 2) {
+        component_name <- "Precipitation"
+    } else if (component == 3) {
+        component_name <- "Snowfall Flux"
+    } else if (component == 4) {
+        component_name <- "Solar Radiation"
+    }
 
-  return(component_name)
+    return(component_name)
 }
 
 #' @title Detect Component
@@ -235,10 +235,10 @@ detect_component_name <- function(component) {
 #' @importFrom base list
 #' @importFrom base return
 detect_component <- function(component) {
-  component_variable <- detect_component_variable(component)
-  component_name <- detect_component_name(component)
+    component_variable <- detect_component_variable(component)
+    component_name <- detect_component_name(component)
 
-  return(list(variable = component_variable, name = component_name))
+    return(list(variable = component_variable, name = component_name))
 }
 
 #' @title Load File
@@ -253,10 +253,10 @@ detect_component <- function(component) {
 #' @importFrom base paste
 #' @importFrom base return
 load_file <- function(zone, component_variable) {
-  # Load the data
-  file <- paste(directory, component_variable, "/", "_zone_", zone, ".csv", sep = "")
+    # Load the data
+    file <- paste(directory, component_variable, "/", "_zone_", zone, ".csv", sep = "")
 
-  return(file)
+    return(file)
 }
 
 #' @title Create Data Frame
@@ -274,15 +274,15 @@ load_file <- function(zone, component_variable) {
 #' @importFrom base as.character
 #' @importFrom base return
 create_data_frame <- function(place) {
-  # Read from the data
-  # Create a data frame with the first column as the date,
-  # the second column as the first weather variable, and the third column as the second weather variable
-  data <- data.frame(date = read.csv(place$file)[, 1], variable = read.csv(place$file)[, 2])
+    # Read from the data
+    # Create a data frame with the first column as the date,
+    # the second column as the first weather variable, and the third column as the second weather variable
+    data <- data.frame(date = read.csv(place$file)[, 1], variable = read.csv(place$file)[, 2])
 
-  data$date <- as.Date(data$date, format = "%Y-%m-%d")
-  data$variable <- as.numeric(as.character(data$variable))
+    data$date <- as.Date(data$date, format = "%Y-%m-%d")
+    data$variable <- as.numeric(as.character(data$variable))
 
-  return(data)
+    return(data)
 }
 
 #' @title Standardize Data
@@ -300,12 +300,12 @@ create_data_frame <- function(place) {
 #' @importFrom base length
 #' @importFrom base return
 standardize_data <- function(data) {
-  data <- scale(data, scale = TRUE)
+    data <- scale(data, scale = TRUE)
 
-  # Incase the data is all NA
-  if (is.na(data[1])) {
-    data <- rep(0, length(data))
-  }
+    # Incase the data is all NA
+    if (is.na(data[1])) {
+        data <- rep(0, length(data))
+    }
 
-  return(data)
+    return(data)
 }
