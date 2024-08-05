@@ -1,7 +1,6 @@
 *.zip
 *.nc
 *.status
-data/hourly/
 .python-version
 .lintr
 output/
