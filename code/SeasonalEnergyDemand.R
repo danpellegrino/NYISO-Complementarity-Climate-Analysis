@@ -1,8 +1,13 @@
 library("dplyr")
 library("lubridate")
+library("nasapower")
 library("ggplot2")
 
 source("code/SharedFunctions.R")
+
+parameters <- c("WS2M", "ALLSKY_SFC_SW_DWN")
+
+components <- c("1", "2", "3")
 
 new_component_prompt <- function() {
   # Ask the user which component they want to analyze
@@ -11,8 +16,7 @@ new_component_prompt <- function() {
     "What component do you want to analyze?",
     "\n 1. Wind Speed",
     "\n 2. Discharge",
-    "\n 3. Snowfall",
-    "\n 4. Solar Radiation",
+    "\n 3. Solar Radiation",
     "\n  Option: "
   )
   while (!(component %in% c(components))) {
@@ -33,12 +37,22 @@ new_detect_component_name <- function(component) {
   } else if (component == 2) {
     component_name <- "Discharge"
   } else if (component == 3) {
-    component_name <- "Snowfall Flux"
-  } else if (component == 4) {
     component_name <- "Solar Radiation"
   }
 
   return(component_name)
+}
+
+detect_component_variable <- function(component) {
+  if (component == 1) {
+    component_variable <- "WS2M"
+  } else if (component == 2) {
+    component_variable <- "DISCHARGE"
+  } else if (component == 3) {
+    component_variable <- "ALLSKY_SFC_SW_DWN"
+  }
+
+  return(component_variable)
 }
 
 all_seasons_prompt <- function() {
@@ -91,6 +105,37 @@ detect_season <- function(season) {
   }
 
   return(season_variable)
+}
+
+set_lonlat <- function(zone) {
+  lonlat <- c(0, 0)
+  # Set the longitude and latitude for the NYISO Zones
+  if (zone == "A") {
+    lonlat <- c(-79.17747, 42.1875)
+  } else if (zone == "B") {
+    lonlat <- c(-77.67826, 43.1250)
+  } else if (zone == "C") {
+    lonlat <- c(-76.17904, 42.9375)
+  } else if (zone == "D") {
+    lonlat <- c(-74.86723, 45.0000)
+  } else if (zone == "E") {
+    # CHANGE THIS
+    lonlat <- c(-75.42943, 42.375)
+  } else if (zone == "F") {
+    lonlat <- c(-73.55541, 42.375)
+  } else if (zone == "G") {
+    lonlat <- c(-73.93022, 41.8125)
+  } else if (zone == "H") {
+    lonlat <- c(-73.74282, 41.2500)
+  } else if (zone == "I") {
+    lonlat <- c(-73.74282, 41.0625)
+  } else if (zone == "J") {
+    lonlat <- c(-73.93022, 40.6875)
+  } else if (zone == "K") {
+    lonlat <- c(-73.18061, 41.0625)
+  }
+
+  return(lonlat)
 }
 
 retrieve_demand_data <- function() {
@@ -158,6 +203,28 @@ retrieve_discharge_data <- function(file) {
   return(discharge_data)
 }
 
+download_zone_data <- function(zone) {
+  data <- data.frame(get_power(
+    # The community code for the region of interest
+    # ag - Agroclimatology Archive
+    # sb - Sustainable Buildings Archive
+    # re - Renewable Energy Archive
+
+    # Parameters:
+    # WS2M                  MERRA-2 Wind Speed at 2 Meters (m/s) ;
+    # PRECTOTCORR           MERRA-2 Precipitation Corrected (mm/hour) ;
+    # PRECSNOLAND           MERRA-2 Snow Precipitation Land (mm/hour) ;
+    # ALLSKY_SFC_SW_DWN     CERES SYN1deg All Sky Surface Shortwave Downward Irradiance (MJ/hr)
+    community = "ag",
+    lonlat = set_lonlat(zone),
+    pars = parameters,
+    dates = c("2001-01-01", "2022-12-31"),
+    temporal_api = "hourly",
+  ))
+
+  return(data)
+}
+
 organize_seasonal_data <- function(energy_demand) {
   # Get the hourly seasonal averages (24 hours) for the energy demand (Winter, Spring, Summer, Fall)
   winter <- energy_demand %>%
@@ -192,7 +259,7 @@ organize_seasonal_data <- function(energy_demand) {
 }
 
 seasonal_energy_demand <- function(season, parameter) {
-  file <- "data/hourly/seasonal_energy_demand.RData"
+  file <- "data/hourly/NYS_Seasonal_Energy_Demand.RData"
 
   # If the RData file exists, load it
   if (file.exists(file)) {
@@ -212,19 +279,45 @@ seasonal_energy_demand <- function(season, parameter) {
     save(demand_data, file = file)
   }
 
+  # Special handling for discharge data
   if (parameter$component == 2) {
-    file <- paste("data/hourly/discharge_", parameter$zone, ".RData", sep = "")
+    if (file.exists(paste("data/hourly/Discharge_", parameter$zone, ".RData", sep = ""))) {
+      print(paste("Loading Discharge Data"))
+      load(paste("data/hourly/Discharge_", parameter$zone, ".RData", sep = ""))
+    } else {
+      # Make sure the data directory exists
+      dir.create("data/hourly", showWarnings = FALSE)
 
-    zone_file <- paste("data/hourly/discharge/", parameter$zone, ".csv", sep = "")
-    component_data <- retrieve_discharge_data(zone_file)
+      # Get the discharge data
+      component_data <- retrieve_discharge_data(paste("data/hourly/discharge/", parameter$zone, ".csv", sep = ""))
 
-    component_data <- data.frame(
-      hour = 0:23,
-      value = component_data[[detect_season(season)]]
-    )
+      # Save the data for future use
+      save(component_data, file = paste("data/hourly/Discharge_", parameter$zone, ".RData", sep = ""))
+    }
+  } else {
+    # Load the data
+    if (file.exists(paste("data/hourly/Parameters_", parameter$zone, ".RData", sep = ""))) {
+      # Load the data
+      print(paste("Loading data for Zone", parameter$zone))
+      load(paste("data/hourly/Parameters_", parameter$zone, ".RData", sep = ""))
+    } else {
+      # Make sure the data directory exists
+      dir.create("data/hourly", showWarnings = FALSE)
+
+      # Download the data
+      print(paste("Downloading data for Zone", parameter$zone))
+      data <- download_zone_data(parameter$zone)
+      save(data, file = paste("data/hourly/Parameters_", parameter$zone, ".RData", sep = ""))
+    }
+
+    # Rename the columns to be more descriptive
+    data <- rename(data, month = MO)
+    data <- rename(data, day = DY)
+    data <- rename(data, hour = HR)
+    data <- rename(data, value = detect_component_variable(parameter$component))
+
+    component_data <- organize_seasonal_data(data)
   }
-
-  file <- paste("data/hourly/discharge_", parameter$zone, ".RData", sep = "")
 
   # Seperate the data by the selected season
   demand_data <- data.frame(
@@ -232,11 +325,14 @@ seasonal_energy_demand <- function(season, parameter) {
     value = demand_data[[detect_season(season)]]
   )
 
+  component_data <- data.frame(
+    hour = 0:23,
+    value = component_data[[detect_season(season)]]
+  )
+
   # Normalize the data
   demand_data$value <- standardize_data(demand_data$value)
   component_data$value <- standardize_data(component_data$value)
-
-  print(head(component_data))
 
   # Smooth the data
   demand_data$value <- smooth.spline(demand_data$value, spar = 0.5)$y
@@ -254,7 +350,7 @@ seasonal_energy_demand <- function(season, parameter) {
     ) +
     theme(legend.position = "top")
 
-  ggsave(paste("output/SeasonalEnergyDemand_", detect_season(season), ".png", sep = ""), width = 12, height = 5, units = "in", dpi = 300)
+  ggsave(paste("output/SeasonalEnergyDemand_", parameter$zone, "_", detect_component_variable(parameter$component), "_", detect_season(season), ".png", sep = ""), width = 12, height = 5, units = "in", dpi = 300)
 }
 
 if (all_seasons_prompt() == "N") {
@@ -269,7 +365,15 @@ if (all_seasons_prompt() == "N") {
 } else {
   print("All seasons")
 
-  for (season in 1:4) {
-    seasonal_energy_demand(season)
+  for (zone in c("A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K")) {
+    for (component in c(1, 2, 3)) {
+      parameter <- list(
+        zone = zone,
+        component = component
+      )
+      for (season in 1:4) {
+        seasonal_energy_demand(season, parameter)
+      }
+    }
   }
 }
