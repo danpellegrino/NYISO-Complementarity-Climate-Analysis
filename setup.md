@@ -85,6 +85,6 @@ Bring up an R terminal inside VS Code and then type:
 renv::install()
 ```
 
-An enter `Y` at the `Do you want to proceed?` prompt.
+And enter `Y` at the `Do you want to proceed?` prompt.
 
 After this you're all set! 
